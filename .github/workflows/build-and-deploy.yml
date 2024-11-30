@@ -7,7 +7,7 @@ on:
   # Enable the workflow to run on a schedule
   schedule: 
     - cron: '0 0 * * 0' # Sunday at 0:00
-
+  # Enable the workflow to run on push to the main branch
   push:
     branches: 
       - master
@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version}}
 
+      # Get the current date and set it as an environment variable.
       - name: Get Current Date
         run: echo "CURRENT_DATE=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
 
@@ -48,5 +49,3 @@ jobs:
       # Send a console message at completion.
       - run: |
           echo "Hello ${{github.actor}}. You pushed to ${{github.repository}} at $CURRENT_DATE."
-
-        
