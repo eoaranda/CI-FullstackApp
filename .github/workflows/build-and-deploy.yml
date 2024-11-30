@@ -1,0 +1,52 @@
+name: ci-fullstack-workflow
+
+
+on:
+  # Enable manual triggering of the workflow
+  workflow_dispatch:
+  # Enable the workflow to run on a schedule
+  schedule: 
+    - cron: '0 0 * * 0' # Sunday at 0:00
+
+  push:
+    branches: 
+      - master
+
+# We will set the build job , strategy and steps
+jobs:
+  build:
+
+    # Use the latest version of the Ubuntu runner.
+    runs-on: ubuntu-latest
+    
+    #Use a matrix strategy to use Node.js versions 16.x and 18.x
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
+    steps:
+      # This action checks out your repository so your workflow can access it, into VM runner
+      - uses: actions/checkout@v3
+
+      # Set up a Node.js environment using the specified node version.
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version}}
+
+      - name: Get Current Date
+        run: echo "CURRENT_DATE=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
+
+      # Install the dependencies.
+      - run: cd backend && npm ci
+
+      # Run the tests.
+      - run: cd backend && npm test
+
+      # Run the linter.
+      - run: cd backend && npm run lint
+
+      # Send a console message at completion.
+      - run: |
+          echo "Hello ${{github.actor}}. You pushed to ${{github.repository}} at $CURRENT_DATE."
+
+        
